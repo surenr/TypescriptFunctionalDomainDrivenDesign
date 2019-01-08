@@ -1,5 +1,5 @@
 import { ValidateName } from './order.taking.domain';
-import { Undefined, Decimal, ValidationResponse, ValidationErrors, Type } from './domain.base';
+import { Undefined, Decimal, ValidationResponse, ValidationErrors, Type, List } from './domain.base';
 
 export class UnvalidatedName {
   public readonly kind = 'UnvalidatedName';
@@ -20,11 +20,11 @@ export class OrderId {
   constructor(public value: number) {}
 }
 
-export class WidgetCode extends Type<string> {
+export class WidgetCode extends Type<string, WidgetCode> {
   public readonly kind = 'WidgetCode';
 }
 
-export class GizmoCode extends Type<string>{
+export class GizmoCode extends Type<string, GizmoCode>{
   public readonly kind = 'GizmoCode';
   public equals(other: string): boolean {
     const thisSplit = this.value.split('-')[0];
@@ -61,10 +61,11 @@ export class EnvelopContents extends Undefined { public readonly kind = 'Envelop
 export class Order {
   public readonly kind = 'Order';
   constructor(
+    public orderId: OrderId,
     public customerInfo: CustomerInfo,
     public shippingAddress: ShippingAddress,
     public billingAddress: BillingAddress,
-    public orderLines: Array<OrderLine>,
+    public orderLines: List<OrderLine>,
     public AmountToBill: BillingAmount
   ){}
 }

@@ -81,6 +81,8 @@ const gizmoCode1 = new GizmoCode('111-237248-2939');
 const gizmoCode2 = new GizmoCode('11w1-384838-2882');
 console.log('GIZMO CODE EQUALITY CHECK: ', gizmoCode1.equals(gizmoCode2.value))
 console.log(gizmoCode1 instanceof GizmoCode)
+const gizmoCode3= gizmoCode1.with({value: '49949-248928'});
+console.log('Gizmo code 3:', gizmoCode3);
 
 async function main() {
   console.log('Main Method simulation');

@@ -1,5 +1,5 @@
 
-export abstract class Type<T> {
+export abstract class Type<T, U> {
   constructor(public value: T) {}
   public equals(other: T): boolean {
     if (typeof this.value === 'object') {
@@ -8,6 +8,17 @@ export abstract class Type<T> {
        }
     }
     return this.value === other;
+  }
+  public with(updates: any): U {
+    const current: any = this;
+    if(typeof updates !== 'object') throw new Error('You must pass an object to update with.')
+    for(const key of Object.keys(updates)){
+      if(!current[key]) throw new Error('One or more missmatched keys')
+    }
+    return <U>({
+      ...this,
+      ...updates,
+    });
   }
 }
 
@@ -48,12 +59,12 @@ export function invalidToUndefined (object: any) {
   return object
 }
 
-export class Decimal  extends Type<number> {public readonly kind = 'Decimal'}
-export class Number  extends Type<number>{public readonly kind = 'Number'}
+export class Decimal  extends Type<number, Decimal> {public readonly kind = 'Decimal'}
+export class Number  extends Type<number, Number>{public readonly kind = 'Number'}
 
-export class String extends Type<string> {public readonly kind = 'String'}
+export class String extends Type<string, String> {public readonly kind = 'String'}
 
-export class ErrorType extends Type<Error>{
+export class ErrorType extends Type<Error, ErrorType>{
   public readonly kind = 'Error';
   public readonly message: string = '';
   constructor(value: Error){
@@ -64,11 +75,11 @@ export class ErrorType extends Type<Error>{
     return this.value.message === other.message
   }
 }
-export class Undefined extends Type<undefined>{}
+export class Undefined extends Type<undefined, Undefined>{}
 
 export type Result<T, U> = T | U;
 
-export class ValidationErrors extends Type<Error[]> {
+export class ValidationErrors extends Type<Error[], ValidationErrors> {
   public readonly kind = 'ValidationErrors';
   public equals(other: Error[]): boolean {
     if (this.value.length !== other.length) return false;
@@ -79,6 +90,6 @@ export class ValidationErrors extends Type<Error[]> {
   }
 }
 
-export class ValidationResponse<T> extends Type<Result<T, ValidationErrors>> {public readonly kind = 'ValidationResponse'}
-export class AsyncResponse<T> extends Type<Result<T, ErrorType>> {public readonly kind = 'AsyncResponse'}
+export class ValidationResponse<T> extends Type<Result<T, ValidationErrors>, ValidationResponse<T>> {public readonly kind = 'ValidationResponse'}
+export class AsyncResponse<T> extends Type<Result<T, ErrorType>, AsyncResponse<T>> {public readonly kind = 'AsyncResponse'}
 
